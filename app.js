@@ -50,6 +50,9 @@ app.get('/delete', (req,res) => {
 app.get('/update', (req,res) => {
     res.sendFile('./public/update.html', {root: __dirname});
 });
+app.get('/search', (req,res) => {
+    res.sendFile('./public/search.html', {root: __dirname});
+});
 
 app.post('/regprocess',ed ,(req,res) => {
 
@@ -142,5 +145,35 @@ app.post('/updprocess',ed ,(req,res) => {
         res.send("Invalid email or password.");
     });
 });
+
+
+app.post('/searchprocess',ed ,(req,res) => {
+
+    var a = req.body.email;
+    var q = "select * from myapplicant where email = '"+a+"'";
+
+    con.query (q,function (err, result) {
+        if (err)
+        throw err;
+
+    var L = result.length;
+    if (L > 0) {
+        var a = result[0].name;
+        var b = result[0].email;
+        var c = result[0].password;
+        var d = result[0].gender;
+        var e = result[0].birthdate;
+        var f = result[0].address;
+        var g = result[0].phone;
+
+        var data = `${a} ${b} ${c} ${d} ${e} ${f} ${g}`;
+            res.send(data);
+        } else {
+            res.send('Email not found');
+        }
+
+    });
+});
+
 
 app.listen(2000);
