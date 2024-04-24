@@ -1,6 +1,9 @@
 var express = require('express');
 const { dirname } = require('path');
 var app = express();
+const session = require("express-session");
+
+app.set('view engine','ejs');
 
 var my = require('mysql');
 var con = my.createConnection({
@@ -13,7 +16,7 @@ var con = my.createConnection({
 
 con.connect((err) => {
     if(err)
-    throw err;
+        throw err;
 console.log("connected");
 });
 
@@ -24,7 +27,7 @@ var ed = bd.urlencoded({extended: false});
 app.use(express.static('public'));
 
 app.get('/', (req,res) => {
-    res.sendFile('./public/home.html', {root: __dirname});
+    res.sendFile('/public/home.html', {root: __dirname});
 });
 app.get('/register', (req,res) => {
     res.sendFile('./public/register.html', {root: __dirname});
@@ -175,5 +178,23 @@ app.post('/searchprocess',ed ,(req,res) => {
     });
 });
 
+app.get('/showall', function (req,res){
+
+    var q = "select * from myapplicant";
+
+    con.query(q,function(err,result){
+        if (err)
+            throw err;
+
+        var tab = "<table border = '1px'> <tr> <th> Name </th>  <th> Email </th>  <th> Password </th>  <th> Gender </th>  <th> Birthdate </th>  <th> Addres </th>  <th> Phone </th> </tr>";
+        for (i = 0; i < result.length; i++) {
+            tab+= " <tr> <td> "+result[i].name+" </td>  <td> "+result[i].email+" </td>  <td> "+result[i].password+" </td>  <td> "+result[i].gender+" </td>  <td> "+result[i].birthdate+" </td>  <td> "+result[i].address+" </td>  <td> "+result[i].phone+" </td> </tr>";
+          
+        }
+
+        tab+= "</table>";
+        res.send(tab);
+    })
+});
 
 app.listen(2000);
